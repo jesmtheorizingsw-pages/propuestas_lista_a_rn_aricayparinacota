@@ -1,0 +1,305 @@
+import React, { useState } from 'react';
+import { 
+  Star, 
+  ChevronDown, 
+  ChevronUp, 
+  Users, 
+  MessageSquare, 
+  BookOpen, 
+  Map, 
+  Shield, 
+  Briefcase, 
+  UserPlus, 
+  Music, 
+  GraduationCap,
+  MapPin,
+  Award
+} from 'lucide-react';
+
+// --- DATA ---
+const regionalCandidates = [
+  { role: 'Presidente', name: 'Freddy Flores Maldonado' },
+  { role: 'Vicepresidente', name: 'Juan Carlos Chinga Palma' },
+  { role: 'Vicepresidente', name: 'Gregorio Mendoza Chura' },
+  { role: 'Secretaria', name: 'Alicia Quispe Delgado' },
+  { role: 'Tesorero', name: 'Jorge Bernal Peralta' },
+];
+
+const communalCandidates = [
+  { role: 'Presidente', name: 'Heriberto Silva Vergara' },
+  { role: 'Vicepresidente', name: 'Roland Mery Rojas' },
+  { role: 'Vicepresidente', name: 'Enrique Gaspar Orlando' },
+  { role: 'Secretario', name: 'Víctor Beretta Navarrete' },
+  { role: 'Tesorera', name: 'Luisa Guerrero González' },
+];
+
+const axes = [
+  { 
+    id: 1, 
+    icon: <Users className="w-6 h-6 text-blue-700" />, 
+    title: 'Fortalecer la vida interna del partido', 
+    desc: 'Impulsar una RN más activa, ordenada y cercana a su militancia, con mejor coordinación comunal y regional.' 
+  },
+  { 
+    id: 2, 
+    icon: <MessageSquare className="w-6 h-6 text-blue-700" />, 
+    title: 'Más participación y mejor comunicación', 
+    desc: 'Promover una vida partidaria donde los militantes estén debidamente informados, tengan más espacios para participar y se sientan parte real del proyecto político.' 
+  },
+  { 
+    id: 3, 
+    icon: <BookOpen className="w-6 h-6 text-blue-700" />, 
+    title: 'Formación política y desarrollo de liderazgos', 
+    desc: 'Fomentar instancias de formación doctrinaria, capacitación política y proyección de nuevos liderazgos para fortalecer a RN en la región.' 
+  },
+  { 
+    id: 4, 
+    icon: <Map className="w-6 h-6 text-blue-700" />, 
+    title: 'Trabajo territorial con visión regional', 
+    desc: 'Construir una RN más conectada con los problemas reales de Arica y Parinacota, con presencia en el territorio y una mirada regionalista coherente con las necesidades locales.' 
+  },
+  { 
+    id: 5, 
+    icon: <Shield className="w-6 h-6 text-blue-700" />, 
+    title: 'Transparencia, probidad y responsabilidad', 
+    desc: 'Promover una cultura interna basada en transparencia, probidad, evaluación del trabajo partidario y responsabilidad en el ejercicio de los cargos.' 
+  },
+  { 
+    id: 6, 
+    icon: <Briefcase className="w-6 h-6 text-blue-700" />, 
+    title: 'Vinculación técnica y gestión pública', 
+    desc: 'Trabajar para que nuestros militantes aporten al futuro gobierno y a la gestión pública, reactivando el estamento de profesionales y técnicos como espacio de propuesta y articulación.' 
+  },
+  { 
+    id: 7, 
+    icon: <UserPlus className="w-6 h-6 text-blue-700" />, 
+    title: 'Fortalecimiento del trabajo con juventudes', 
+    desc: 'Impulsar un trabajo más activo con jóvenes, promoviendo nuevos liderazgos para los desafíos electorales futuros y generando vínculos con centros de estudiantes.' 
+  },
+  { 
+    id: 8, 
+    icon: <Music className="w-6 h-6 text-blue-700" />, 
+    title: 'Participación juvenil en artes, cultura y deporte', 
+    desc: 'Promover espacios de participación y encuentro reconociendo que allí existe una presencia juvenil activa, clave para proyectar una RN más conectada con las nuevas generaciones.' 
+  },
+  { 
+    id: 9, 
+    icon: <GraduationCap className="w-6 h-6 text-blue-700" />, 
+    title: 'Capacitación para dirigentes sociales', 
+    desc: 'Trabajar en la formación legal y política de nuestros militantes que cumplen roles de dirigencia en gremios y juntas de vecinos, fortaleciendo su capacidad de liderazgo y servicio.' 
+  },
+];
+
+// --- COMPONENTS ---
+
+const AccordionItem = ({ axis, isOpen, onClick }) => {
+  return (
+    <div className="border-b border-gray-200 bg-white rounded-lg shadow-sm mb-3 overflow-hidden transition-all duration-300">
+      <button 
+        className="w-full flex items-center justify-between p-4 text-left focus:outline-none hover:bg-gray-50 transition-colors"
+        onClick={onClick}
+      >
+        <div className="flex items-center space-x-4">
+          <div className="p-2 bg-blue-50 rounded-full">
+            {axis.icon}
+          </div>
+          <span className="font-semibold text-gray-800 text-lg">
+            {axis.id}. {axis.title}
+          </span>
+        </div>
+        {isOpen ? (
+          <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+        ) : (
+          <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+        )}
+      </button>
+      
+      <div 
+        className={`transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-48 opacity-100 p-4 pt-0' : 'max-h-0 opacity-0 overflow-hidden'
+        }`}
+      >
+        <div className="pl-14 text-gray-600 leading-relaxed border-l-2 border-red-500 ml-6">
+          <p className="pl-4">{axis.desc}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CandidateList = ({ title, candidates, type }) => {
+  const isRegional = type === 'regional';
+  return (
+    <div className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-blue-700 h-full">
+      <div className="flex items-center space-x-3 mb-6 border-b pb-4">
+        {isRegional ? <MapPin className="text-red-600 w-8 h-8" /> : <Award className="text-red-600 w-8 h-8" />}
+        <h3 className="text-2xl font-bold text-blue-900">{title}</h3>
+      </div>
+      <ul className="space-y-4">
+        {candidates.map((cand, idx) => (
+          <li key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+            <span className="text-sm font-bold text-red-600 uppercase tracking-wider mb-1 sm:mb-0">
+              {cand.role}
+            </span>
+            <span className="text-gray-800 font-medium sm:text-right">
+              {cand.name}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// --- MAIN APP COMPONENT ---
+
+export default function App() {
+  const [openAccordion, setOpenAccordion] = useState(1);
+
+  const toggleAccordion = (id) => {
+    setOpenAccordion(openAccordion === id ? null : id);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-800 selection:bg-red-500 selection:text-white">
+      {/* Navigation / Header */}
+      <header className="bg-blue-800 text-white sticky top-0 z-50 shadow-md">
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <div className="relative flex items-center justify-center w-10 h-10 bg-white rounded-full">
+               {/* Simulación del logo de la estrella */}
+               <Star className="w-6 h-6 text-red-600 absolute" fill="currentColor" />
+               <Star className="w-5 h-5 text-blue-800 absolute z-10" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">Renovación Nacional</span>
+          </div>
+          <nav className="hidden md:flex space-x-6 text-sm font-medium">
+            <a href="#vision" className="hover:text-red-400 transition-colors">Visión</a>
+            <a href="#equipo" className="hover:text-red-400 transition-colors">Nuestro Equipo</a>
+            <a href="#propuestas" className="hover:text-red-400 transition-colors">Los 9 Ejes</a>
+          </nav>
+        </div>
+        <div className="h-1 w-full bg-red-600"></div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative bg-blue-900 text-white py-20 px-4 overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+          <Star className="absolute top-10 left-10 w-32 h-32" />
+          <Star className="absolute bottom-10 right-10 w-48 h-48" />
+        </div>
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          <span className="inline-block py-1 px-3 rounded-full bg-red-600 text-white text-sm font-bold tracking-widest mb-6">
+            ARICA Y PARINACOTA
+          </span>
+          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+            RN debe dar un <span className="text-red-500">nuevo paso</span>
+          </h1>
+          <p className="text-xl md:text-2xl font-light mb-10 text-blue-100">
+            Más partido, más región y más participación. 💙🇨🇱
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="#propuestas" className="px-8 py-4 bg-white text-blue-900 font-bold rounded-full shadow-lg hover:bg-gray-100 transition-all transform hover:-translate-y-1">
+              Conoce nuestras propuestas
+            </a>
+            <a href="#equipo" className="px-8 py-4 border-2 border-red-500 text-white font-bold rounded-full hover:bg-red-600 transition-all">
+              Vota Lista A
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Vision Section */}
+      <section id="vision" className="py-16 px-4 bg-white">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl font-bold text-blue-900 mb-8 relative inline-block">
+            Nuestra Visión
+            <span className="absolute bottom-0 left-1/4 w-1/2 h-1 bg-red-600 rounded"></span>
+          </h2>
+          <div className="text-lg text-gray-700 space-y-6 text-justify md:text-center leading-relaxed">
+            <p>
+              Necesitamos un proyecto que fortalezca de verdad a Renovación Nacional desde el territorio, con una directiva cercana a la militancia, activa en las comunas, transparente en su actuar y capaz de levantar un verdadero <strong>Plan de Desarrollo Regional</strong> para el futuro político de nuestra región. No basta con administrar el partido; hay que <em>organizar, formar, escuchar y proyectar</em>.
+            </p>
+            <p>
+              RN tiene que crecer con más formación política, más trabajo comunal, más presencia en los barrios, más vínculo con la sociedad civil, más liderazgo joven y más capacidad para estudiar y proponer soluciones a los problemas reales de Arica y Parinacota. 📍🤝
+            </p>
+            <p className="font-semibold text-blue-800 text-xl pt-4">
+              El futuro se construye con unidad, probidad y visión regionalista. 🏛️✨
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Candidates Section */}
+      <section id="equipo" className="py-16 px-4 bg-gray-100">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-blue-900 mb-4">Nuestro Gran Equipo</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Queremos una RN más fuerte, más preparada y conectada. Conoce a los candidatos de la Lista A preparados para liderar este cambio.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <CandidateList 
+              title="Directiva Regional" 
+              candidates={regionalCandidates} 
+              type="regional"
+            />
+            <CandidateList 
+              title="Directiva Comunal (Arica)" 
+              candidates={communalCandidates} 
+              type="comunal"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Proposals / 9 Axes Section */}
+      <section id="propuestas" className="py-16 px-4 bg-white">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-blue-900 mb-4">Los 9 Ejes Fundamentales</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Nuestra propuesta programática para estructurar, modernizar y fortalecer el rol de Renovación Nacional en Arica y Parinacota.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            {axes.map((axis) => (
+              <AccordionItem 
+                key={axis.id} 
+                axis={axis} 
+                isOpen={openAccordion === axis.id}
+                onClick={() => toggleAccordion(axis.id)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Footer */}
+      <section className="bg-red-600 py-16 px-4 text-center text-white">
+        <div className="container mx-auto max-w-3xl">
+          <Star className="w-12 h-12 mx-auto mb-6 opacity-80" />
+          <h2 className="text-3xl md:text-5xl font-extrabold mb-6">
+            Ese debe ser el camino. 🚀💙
+          </h2>
+          <p className="text-xl mb-8 font-light">
+            Tenemos un gran equipo y una gran propuesta para el futuro de nuestra región.
+          </p>
+          <div className="inline-block bg-blue-900 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-2xl uppercase tracking-widest">
+            Por eso Vota Lista A
+          </div>
+        </div>
+      </section>
+
+      {/* Simple Footer */}
+      <footer className="bg-blue-950 py-6 text-center text-blue-300 text-sm">
+        <p>© 2026 Lista A - Renovación Nacional. Arica y Parinacota.</p>
+      </footer>
+    </div>
+  );
+}
